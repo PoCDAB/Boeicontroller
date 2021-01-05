@@ -1,6 +1,6 @@
 import RPi.GPIO as gpio
 import ast
-import json
+import json as js
 import os
 import re
 import socket
@@ -111,3 +111,5 @@ def main():
             sleep(on_time)
         gpio.Output(7, gpio.LOW)
         sleep(off_time)
+
+main()
