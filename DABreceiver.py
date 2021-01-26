@@ -1,7 +1,7 @@
+import socket
+
 class DABreceiver:
 
-    ip = None 	#IP to listen to    
-    port = None		# port to listen to
     cumData = ""
     lrpn = -1 #lastReceivedPacketNumber
     busy = False
@@ -10,13 +10,15 @@ class DABreceiver:
     packetCounter = 0   
     inTransmission = False
 
-    def __init__(self, ip, port):
+    def __init__(self, ip: str, port: int):
         self.ip = ip
         self.port = port
         
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)	#create a socket
-    sock.bind((ip, port))				#bind the socket to the IP and port
+    def sockets(self):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)	#create a socket
+        sock.bind((self.ip, self.port))
+        return sock				#bind the socket to the IP and port
     
 
     def checkChecksum(self, string, givenChecksum):
@@ -41,49 +43,49 @@ class DABreceiver:
 
     def main(self):
         while True:
-            data, addr = sock.recvfrom(4096)	#receive data
+            data, addr = self.sockets().recvfrom(4096)	#receive data
             data = data.decode('utf-8')
             packetNumber = int(data[0])
-            packetCounter += 1
+            self.packetCounter += 1
             data = data[1:]
             print('new Packet: ' + data + '\n')
             if(packetNumber == 0):
-                inTransmission = True
-                lrpn = -1
-                if(list != []):
-                    megaList.append(list)
-                    list = []
-                packetCounter = 0
-                for x in megaList:
+                self.inTransmission = True
+                self.lrpn = -1
+                if(self.list != []):
+                    self.megaList.append(self.list)
+                    self.list = []
+                self.packetCounter = 0
+                for x in self.megaList:
                     if(data in x[0]):
-                        list = x
-                        megaList.remove(list)
-            if(not inTransmission):
+                        self.list = x
+                        self.megaList.remove(self.list)
+            if(not self.inTransmission):
                 continue
-            if(packetNumber < lrpn):
+            if(packetNumber < self.lrpn):
                 packetNumber += 9
-            for x in range(packetNumber - (lrpn + 1)):
-                list.append('')
-                packetCounter += 1
-            if(len(list) > packetCounter):
-                list[packetCounter] = data
+            for x in range(packetNumber - (self.lrpn + 1)):
+                self.list.append('')
+                self.packetCounter += 1
+            if(len(self.list) > self.packetCounter):
+                self.list[self.packetCounter] = data
             else:
-                list.append(data)
+                self.list.append(data)
             if(packetNumber != 0 and '|' in data):
-                if(verifyFile(list, packetCounter)):
-                    string = ''.join(list)
+                if(self.verifyFile(self.list, self.packetCounter)):
+                    string = ''.join(self.list)
                     fileData = string.split('|')
                     string = fileData[0] + '|' + fileData[1]
                     fileWithoutChecksum = string[:-2]
                     checksum = string[-2:]
-                    if(checkChecksum(fileWithoutChecksum, checksum)):
+                    if(self.checkChecksum(fileWithoutChecksum, checksum)):
                         fileData = fileWithoutChecksum.split('|')
                         f = open(fileData[0], 'w')
                         f.write(fileData[1])
                         f.close()
                         print('file has been written\n')
-                        list = []
-                        inTransmission = False
+                        self.list = []
+                        self.inTransmission = False
                     else:
                         print('checksum was not equal')
-            lrpn = packetNumber
+            self.lrpn = packetNumber
