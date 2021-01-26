@@ -98,7 +98,7 @@ class BuoyController:
             if self.check_light_level(light_level):
                 gpio.output(7, gpio.HIGH)
                 sleep(on_time)
-            gpio.Output(7, gpio.LOW)
+            gpio.output(7, gpio.LOW)
             sleep(off_time)
 
 buoy = BuoyController("10.0.0.1", 4242)
