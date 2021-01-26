@@ -1,33 +1,26 @@
-# import RPi.GPIO as gpio
-import ast
+import RPi.GPIO as gpio
 import json as js
 import os
-import re
-import socket
-# import spidev
+import spidev
 
 from DABreceiver import DABreceiver 
 from time import sleep
 
-# gpio.setwarnings(False)
-# gpio.setmode(gpio.BOARD)
+gpio.setwarnings(False)
+gpio.setmode(gpio.BOARD)
 
 
 class BuoyController:
-    
-    ip = None
-    port = None
-    first_run = True
-    
+     
 
     # GPIO led pin definition
-    # gpio.setup(7, gpio.OUT, initial=gpio.LOW)
+    gpio.setup(7, gpio.OUT, initial=gpio.LOW)
 
 
     # open the SPI bus
-    # spi = spidev.SpiDev()
-    # spi.open(0, 0)
-    # spi.max_speed_hz = 100000
+    spi = spidev.SpiDev()
+    spi.open(0, 0)
+    spi.max_speed_hz = 100000
 
 
     def __init__(self, ip: str, port: int):
@@ -38,15 +31,15 @@ class BuoyController:
 
 
     # read data from MCP3008
-    # def read_channel(self, channel):
-        # adc = self.spi.xfer2([1, (8+channel) << 4, 0])
-        # light_data = ((adc[1] & 3) << 8) + adc[2]
-        # return light_data
+    def read_channel(self, channel):
+        adc = self.spi.xfer2([1, (8+channel) << 4, 0])
+        light_data = ((adc[1] & 3) << 8) + adc[2]
+        return light_data
 
-    # def check_light_level(self, defaults=940):
-    #     """check the light levels of the surrounding area. The value could be changed if deemed necessary for
-    #     different situations""" 
-    #     return True if self.read_channel(0) > defaults else False
+    def check_light_level(self, defaults=940):
+        """check the light levels of the surrounding area. The value could be changed if deemed necessary for
+        different situations""" 
+        return True if self.read_channel(0) > defaults else False
 
 
     def check_json(self, source:str, write=False, light_lvl=940, on_time=5, off_time=10):
@@ -96,17 +89,17 @@ class BuoyController:
     def main(self):
         while True:
             self.DAB.main()
-            # dab_data = self.compare_config()
+            dab_data = self.compare_config()
             
-            # light_level = dab_data[0]
-            # on_time = dab_data[1]
-            # off_time = dab_data[2]
+            light_level = dab_data[0]
+            on_time = dab_data[1]
+            off_time = dab_data[2]
 
-            # if self.check_light_level(light_level):
-            #     gpio.output(7, gpio.HIGH)
-            #     sleep(on_time)
-            # gpio.Output(7, gpio.LOW)
-            # sleep(off_time)
+            if self.check_light_level(light_level):
+                gpio.output(7, gpio.HIGH)
+                sleep(on_time)
+            gpio.Output(7, gpio.LOW)
+            sleep(off_time)
 
 buoy = BuoyController("10.0.0.1", 4242)
 buoy.main()
