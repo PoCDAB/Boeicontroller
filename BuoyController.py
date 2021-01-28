@@ -4,6 +4,7 @@ import spidev
 
 from FileOps import FileOps
 from time import sleep
+from threading import Thread, Lock
 
 gpio.setwarnings(False)
 gpio.setmode(gpio.BOARD)
@@ -25,6 +26,7 @@ class BuoyController:
         self.port = port
         self.accepted_name = self.ip + ".json"
         self.f1 = FileOps(self.accepted_name) # composition object
+        self.mutex = Lock()
 
     # read data from MCP3008
     def read_channel(self, channel):
@@ -41,12 +43,15 @@ class BuoyController:
     def main(self):
         print("running controller")
         while True:
-            config = self.f1.read_config()
-            self.f1.save_config()
+            self.mutex.acquire()
+            try:
+                config = self.f1.read_config()
+                self.f1.save_config()
+            finally:
+                self.mutex.release()
             light_level = config["light_lvl"]
             on_time = config["on_time"]
             off_time = config["off_time"]
-            print(light_level, on_time, off_time)
             if self.check_light_level(light_level):
                 gpio.output(7, gpio.HIGH)
                 sleep(on_time)
@@ -57,5 +62,6 @@ class BuoyController:
 print("creating controller object")
 buoy = BuoyController("10.0.0.1", 4242)
 print("running main")
-buoy.main()
+t1 = Thread(target=buoy.main())
+t1.start()
 
