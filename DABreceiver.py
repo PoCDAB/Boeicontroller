@@ -90,4 +90,7 @@ class DABreceiver:
                     else:
                         print('checksum was not equal')
             self.lrpn = packetNumber
-
+            
+            
+receiver = DABreceiver("10.0.0.1", 4242)
+receiver.main()
