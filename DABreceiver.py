@@ -72,7 +72,7 @@ class DABreceiver:
                 self.list[self.packetCounter] = data
             else:
                 self.list.append(data)
-             if(packetNumber != 0 and '|' in data):
+            if(packetNumber != 0 and '|' in data):
                 if(self.verifyFile(self.list, self.packetCounter)):
                     string = ''.join(self.list)
                     fileData = string.split('|')
