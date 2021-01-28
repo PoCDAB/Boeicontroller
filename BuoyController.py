@@ -34,6 +34,7 @@ class BuoyController:
         light_data = ((adc[1] & 3) << 8) + adc[2]
         return light_data
 
+
     def check_light_level(self, defaults=940):
         """check the light levels of the surrounding area. The value could be changed if deemed necessary for
         different situations"""
@@ -43,16 +44,19 @@ class BuoyController:
     def main(self):
         print("running controller")
         while True:
-            self.mutex.acquire()
+            self.mutex.acquire() # lock the thread so that no other may bother the config file
+
             try:
                 config = self.f1.read_config()
                 self.f1.save_config()
             finally:
-                self.mutex.release()
+                self.mutex.release() 
+
             light_level = config["light_lvl"]
             on_time = config["on_time"]
             off_time = config["off_time"]
-            if self.check_light_level(light_level):
+
+            if self.check_light_level(light_level): # 
                 gpio.output(7, gpio.HIGH)
                 sleep(on_time)
             gpio.output(7, gpio.LOW)
@@ -62,6 +66,6 @@ class BuoyController:
 print("creating controller object")
 buoy = BuoyController("10.0.0.1", 4242)
 print("running main")
+
 t1 = Thread(target=buoy.main())
 t1.start()
-
