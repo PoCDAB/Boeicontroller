@@ -6,15 +6,16 @@ from os.path import isfile
 
 class FileOps:
 
+    file_name = ""
 
     def __init__(self, file_name: str):
-        self.file_name = file_name + ".json"
+        self.file_name = file_name
         self.config_name = "config.json"
         self.preset_config = {"light_lvl" : 940, "on_time" : 1, "off_time" : 2}
 
 
     def save_config(self):
-        if self.check_new():
+        if isfile(self.file_name):
             with open(self.config_name, "w") as file:
                 js.dump(self.pass_new(), file, indent=2)
                 remove(self.file_name) # delete the newly arrived config to prevent clutter
@@ -33,18 +34,11 @@ class FileOps:
 
 
     def pass_new(self):
-        if self.check_new():
+        if isfile(self.file_name):
             with open(self.file_name, "r") as file:
                 json_string = ""
                 for line in file:
                     json_string += line
                 return js.loads(json_string) 
 
-
-    def check_new(self):
-        return True if isfile(self.file_name) else False 
              
-
-f1 = FileOps("10.0.0.1")
-f1.read_config()
-f1.save_config()
