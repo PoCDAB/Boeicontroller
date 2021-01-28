@@ -7,4 +7,7 @@ sleep 3
 cd Boeicontroller
 
 sudo python3 DABreceiver.py &
+
+sleep 3
+
 sudo python3 BuoyController.py
