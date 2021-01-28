@@ -39,8 +39,8 @@ class BuoyController:
 
 
     def main(self):
-        config = self.f1.read_config()
         while True:
+            config = self.f1.read_config()
             self.f1.save_config()
             light_level = config["light_lvl"]
             on_time = config["on_time"]
