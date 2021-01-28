@@ -1,25 +1,27 @@
 import socket
+import array
+import time
 
 class DABreceiver:
 
-    cumData = ""
-    lrpn = -1 #lastReceivedPacketNumber
-    busy = False
+    packetCounter = 0
     list = []
     megaList = []
-    packetCounter = 0   
+    lrpn = -1
     inTransmission = False
 
-    def __init__(self, ip: str, port: int):
+
+    def __init__(self, ip, port):
         self.ip = ip
         self.port = port
-        
+
 
     def sockets(self):
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)	#create a socket
-        sock.bind((self.ip, self.port))
-        return sock				#bind the socket to the IP and port
-    
+        sock = socket.socket(
+            socket.AF_INET, socket.SOCK_DGRAM)  # create a socket
+        sock.bind((self.ip, self.port))  # bind the socket to the IP and port
+        return sock
+
 
     def checkChecksum(self, string, givenChecksum):
         string = string.encode()
@@ -32,7 +34,7 @@ class DABreceiver:
         if(checksum[2:] == givenChecksum):
             return True
         return False
-    
+
     def verifyFile(self, list, packetCounter):
         for x in range(packetCounter):
             if(list[x] == ''):
@@ -40,10 +42,9 @@ class DABreceiver:
                 return False
         return True
 
-
     def main(self):
         while True:
-            data, addr = self.sockets().recvfrom(4096)	#receive data
+            data, addr = self.sockets().recvfrom(4096)  # receive data
             data = data.decode('utf-8')
             packetNumber = int(data[0])
             self.packetCounter += 1
@@ -71,7 +72,7 @@ class DABreceiver:
                 self.list[self.packetCounter] = data
             else:
                 self.list.append(data)
-            if(packetNumber != 0 and '|' in data):
+             if(packetNumber != 0 and '|' in data):
                 if(self.verifyFile(self.list, self.packetCounter)):
                     string = ''.join(self.list)
                     fileData = string.split('|')
@@ -89,3 +90,4 @@ class DABreceiver:
                     else:
                         print('checksum was not equal')
             self.lrpn = packetNumber
+
