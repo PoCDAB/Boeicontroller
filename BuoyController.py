@@ -19,11 +19,12 @@ class BuoyController:
     spi.open(0, 0)
     spi.max_speed_hz = 100000
 
+    
     def __init__(self, ip: str, port: int):
         self.ip = ip
         self.port = port
         self.accepted_name = self.ip + ".json"
-        self.f1 = FileOps(self.accepted_name)
+        self.f1 = FileOps(self.accepted_name) # composition object
 
     # read data from MCP3008
     def read_channel(self, channel):
@@ -38,7 +39,6 @@ class BuoyController:
 
 
     def main(self):
-        print("running controller")
         config = self.f1.read_config()
         while True:
             self.f1.save_config()
@@ -53,7 +53,7 @@ class BuoyController:
             sleep(off_time)
 
 
-print("creating object")
+print("creating controller object")
 buoy = BuoyController("10.0.0.1", 4242)
 print("running main")
 buoy.main()
