@@ -9,7 +9,7 @@ as the documentation over there should be sufficient in order to set it up.
 
 
 ## setup
-Run the ./setup.sh to install all the necessary packages. If all goes well, you should be able to instantly run the project.
+Run the ```./setup.sh``` to install all the necessary packages. If all goes well, you should be able to instantly run the project.
 If not, open an issue and I'll get in touch with you (fingers crossed).
 
 ## executing the main components
